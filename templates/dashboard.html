@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — ADREAN{% endblock %}
+{% block extra_head %}
+<style>
+  .dash-wrap { max-width:900px; margin:0 auto; padding:3rem 1.5rem; }
+  .dash-title { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:3px; }
+  .dash-title span { color:var(--accent); }
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin:2rem 0; }
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.25rem; }
+  .stat-card .num { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:var(--accent); line-height:1; }
+  .stat-card .lbl { font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+  .reg-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.5rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; transition:border-color 0.2s; }
+  .reg-card:hover { border-color:rgba(0,255,204,0.3); }
+  .reg-event-name { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:2px; }
+  .reg-game { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:2px; margin-bottom:0.3rem; }
+  .slot-badge { background:rgba(0,255,204,0.1); border:1px solid rgba(0,255,204,0.3); border-radius:6px; padding:0.5rem 1rem; text-align:center; }
+  .slot-badge .slot-num { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--accent); line-height:1; }
+  .slot-badge .slot-lbl { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  @media(max-width:600px) { .stats-row { grid-template-columns:1fr 1fr; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="dash-wrap">
+  <h1 class="dash-title">MY <span>DASHBOARD</span></h1>
+  <p class="text-muted mt-1">Welcome back, <strong style="color:var(--text);">{{ user.username }}</strong></p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num">{{ registrations|length }}</div>
+      <div class="lbl">Events Joined</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{{ registrations|selectattr('verified','equalto',true)|list|length }}</div>
+      <div class="lbl">Confirmed Slots</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{{ registrations|rejectattr('verified','equalto',true)|list|length }}</div>
+      <div class="lbl">Pending Review</div>
+    </div>
+  </div>
+
+  <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;margin-bottom:1rem;">MY REGISTRATIONS</h2>
+
+  {% if registrations %}
+    {% for reg in registrations %}
+    <div class="reg-card">
+      <div>
+        <div class="reg-game">{{ reg.event.game }}</div>
+        <div class="reg-event-name">{{ reg.event.title }}</div>
+        <div class="text-muted" style="font-size:0.9rem;">
+          📅 {{ reg.event.event_date.strftime('%d %b %Y, %I:%M %p') }}<br>
+          🎮 In-game: <strong>{{ reg.ingame_name }}</strong><br>
+          💳 Payment: {{ reg.payment_method or 'N/A' }}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;">
+        {% if reg.verified %}
+          <div class="slot-badge">
+            <div class="slot-num">#{{ reg.slot_number }}</div>
+            <div class="slot-lbl">Slot Confirmed</div>
+          </div>
+          <span class="badge badge-green">✅ Verified</span>
+        {% else %}
+          <span class="badge badge-yellow">⏳ Awaiting Payment Verification</span>
+          <span class="text-muted" style="font-size:0.8rem;">Admin will confirm after payment check</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align:center;padding:4rem 0;color:var(--muted);">
+      <div style="font-size:3rem;">🎮</div>
+      <p class="mt-2">You haven't joined any events yet.</p>
+      <a href="{{ url_for('events') }}" class="btn btn-primary mt-2">Browse Events</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

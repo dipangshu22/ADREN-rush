@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Events — ADREAN{% endblock %}
+{% block extra_head %}
+<style>
+  .page-header { padding:3rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:3rem; }
+  .page-header h1 { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:4px; }
+  .page-header h1 span { color:var(--accent); }
+  .filter-bar { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.25rem 1.5rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end; margin-bottom:2rem; }
+  .filter-bar .form-group { margin:0; flex:1; min-width:160px; }
+  .event-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1.5rem; }
+  .event-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:all 0.3s; }
+  .event-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+  .event-card-top { padding:1.5rem 1.5rem 1rem; border-bottom:1px solid var(--border); }
+  .event-game { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:2px; text-transform:uppercase; margin-bottom:0.5rem; }
+  .event-title { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:2px; margin-bottom:0.5rem; }
+  .event-card-body { padding:1rem 1.5rem; }
+  .event-meta { display:flex; flex-direction:column; gap:0.3rem; font-size:0.9rem; color:var(--muted); }
+  .event-footer { padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border-top:1px solid var(--border); }
+  .slot-bar { width:100%; height:4px; background:var(--border); border-radius:2px; margin-top:0.5rem; overflow:hidden; }
+  .slot-fill { height:100%; background:var(--accent); border-radius:2px; }
+  .slot-fill.warn { background:#f0a500; }
+  .slot-fill.full { background:var(--accent2); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>ALL <span>EVENTS</span></h1>
+    <p class="text-muted mt-1">Filter by game or date and claim your slot.</p>
+  </div>
+
+  <form class="filter-bar" method="GET">
+    <div class="form-group">
+      <label>Game</label>
+      <select class="form-control" name="game">
+        <option value="">All Games</option>
+        {% for g in games %}
+          <option value="{{ g }}" {% if g==game_filter %}selected{% endif %}>{{ g }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input class="form-control" type="date" name="date" value="{{ date_filter }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('events') }}" class="btn btn-ghost">Reset</a>
+  </form>
+
+  {% if events %}
+    <div class="event-grid">
+      {% for event in events %}
+      {% set pct = (event.slots_filled / event.slots_total * 100)|int %}
+      <div class="event-card">
+        <div class="event-card-top">
+          <div class="event-game">{{ event.game }}</div>
+          <div class="event-title">{{ event.title }}</div>
+          <span class="badge {% if event.status=='upcoming' %}badge-green{% elif event.status=='ongoing' %}badge-yellow{% else %}badge-red{% endif %}">{{ event.status }}</span>
+        </div>
+        <div class="event-card-body">
+          <div class="event-meta">
+            <span>📅 {{ event.event_date.strftime('%d %b %Y, %I:%M %p') }}</span>
+            <span>🏆 {{ event.prize_pool or 'TBD' }}</span>
+            <span>💰 Entry: ₹{{ event.entry_fee|int }}</span>
+            <span>🎮 Slots: {{ event.slots_filled }}/{{ event.slots_total }}</span>
+          </div>
+          <div class="slot-bar mt-1">
+            <div class="slot-fill {% if pct >= 100 %}full{% elif pct >= 70 %}warn{% endif %}" style="width:{{ pct }}%"></div>
+          </div>
+        </div>
+        <div class="event-footer">
+          <span class="text-muted" style="font-size:0.85rem">{{ event.slots_available }} left</span>
+          <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary" style="padding:0.4rem 1rem;font-size:0.8rem">Details →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align:center;padding:5rem 0;color:var(--muted);">
+      <div style="font-size:4rem;">🔍</div>
+      <p class="mt-2">No events match your filter. Try adjusting it.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

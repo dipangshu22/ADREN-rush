@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Register for {{ event.title }} — ADREAN{% endblock %}
+{% block extra_head %}
+<style>
+  .join-wrap { max-width:600px; margin:0 auto; padding:3rem 1.5rem; }
+  .join-title { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:3px; margin-bottom:0.25rem; }
+  .join-title span { color:var(--accent); }
+  .event-info-box { background:var(--surface); border:1px solid rgba(0,255,204,0.2); border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+  .join-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:2rem; }
+  .payment-info { background:rgba(0,255,204,0.05); border:1px solid rgba(0,255,204,0.15); border-radius:8px; padding:1.25rem; margin-bottom:1.5rem; }
+  .payment-info h4 { color:var(--accent); font-size:0.85rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:0.5rem; }
+  .payment-info p { color:var(--muted); font-size:0.9rem; line-height:1.7; }
+  .upi-id { font-family:'Share Tech Mono',monospace; color:var(--text); background:var(--surface2); padding:0.4rem 0.75rem; border-radius:4px; display:inline-block; margin-top:0.3rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="join-wrap">
+  <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color:var(--muted);text-decoration:none;font-size:0.9rem;">← Back</a>
+  <h1 class="join-title mt-2">REGISTER FOR <span>EVENT</span></h1>
+
+  <div class="event-info-box mt-3">
+    <div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--accent);letter-spacing:2px;">{{ event.game }}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;">{{ event.title }}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="color:var(--muted);font-size:0.85rem;">Entry Fee</div>
+      <div style="font-size:1.5rem;font-weight:700;color:var(--accent);">₹{{ event.entry_fee|int }}</div>
+    </div>
+  </div>
+
+  <div class="payment-info">
+    <h4>💳 Payment Instructions</h4>
+    <p>
+      Pay ₹{{ event.entry_fee|int }} via UPI to the admin before registering.<br>
+      UPI ID: <span class="upi-id">admin@upi</span><br><br>
+      After paying, note your transaction ID or screenshot reference below.
+      Your slot will be confirmed once the admin verifies the payment.
+    </p>
+  </div>
+
+  <div class="join-card">
+    <form method="POST">
+      <div class="form-group">
+        <label>In-Game Name *</label>
+        <input class="form-control" type="text" name="ingame_name" placeholder="Your in-game username" required>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input class="form-control" type="text" name="phone" placeholder="For WhatsApp updates">
+      </div>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select class="form-control" name="payment_method">
+          <option value="UPI">UPI</option>
+          <option value="GPay">Google Pay</option>
+          <option value="PhonePe">PhonePe</option>
+          <option value="NEFT">Bank Transfer / NEFT</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Transaction ID / Note</label>
+        <input class="form-control" type="text" name="payment_note" placeholder="UPI Ref # or transaction ID">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.85rem;font-size:1rem;">
+        Submit Registration →
+      </button>
+      <p class="text-muted mt-2" style="font-size:0.85rem;text-align:center;">
+        Slot confirmed only after admin verifies your payment.
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

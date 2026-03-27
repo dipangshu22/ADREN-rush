@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Create Account — ADREAN{% endblock %}
+{% block extra_head %}
+<style>
+  .auth-wrap { min-height: 85vh; display:flex; align-items:center; justify-content:center; padding:3rem 1rem; }
+  .auth-box { width:100%; max-width:440px; }
+  .auth-title { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:3px; margin-bottom:0.25rem; }
+  .auth-title span { color:var(--accent); }
+  .auth-sub { color:var(--muted); margin-bottom:2rem; font-size:0.95rem; }
+  .auth-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:2rem; }
+  .auth-footer { text-align:center; margin-top:1.5rem; color:var(--muted); font-size:0.9rem; }
+  .auth-footer a { color:var(--accent); text-decoration:none; font-weight:700; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <h1 class="auth-title">JOIN THE <span>ARENA</span></h1>
+    <p class="auth-sub">Create your competitor account.</p>
+    <div class="auth-card">
+      <form method="POST">
+        <div class="form-group">
+          <label>Username</label>
+          <input class="form-control" type="text" name="username" placeholder="your_gamertag" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input class="form-control" type="email" name="email" placeholder="you@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input class="form-control" type="password" name="password" placeholder="min 6 characters" minlength="6" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.75rem;">Create Account</button>
+      </form>
+    </div>
+    <div class="auth-footer">Already have an account? <a href="{{ url_for('login') }}">Log In</a></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'admin/base.html' %}
+{% block page_title %}{% if event %}Edit Event{% else %}New Event{% endif %}{% endblock %}
+{% block content %}
+<div style="max-width:700px;">
+  <div class="flex items-center gap-2 mb-2">
+    <a href="{{ url_for('admin_events') }}" class="btn btn-ghost btn-sm">← Back</a>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;">
+      {% if event %}EDIT EVENT{% else %}CREATE NEW EVENT{% endif %}
+    </h2>
+  </div>
+
+  <div class="card mt-2">
+    <div class="card-body">
+      <form method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Event Title *</label>
+            <input class="form-control" type="text" name="title" value="{{ event.title if event else '' }}" placeholder="BGMI Season Opener" required>
+          </div>
+          <div class="form-group">
+            <label>Game *</label>
+            <input class="form-control" type="text" name="game" value="{{ event.game if event else '' }}" placeholder="BGMI / Free Fire / Valorant…" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-control" name="description" placeholder="Event rules, format, special instructions…">{{ event.description if event else '' }}</textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Event Date & Time *</label>
+            <input class="form-control" type="datetime-local" name="event_date"
+              value="{{ event.event_date.strftime('%Y-%m-%dT%H:%M') if event else '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" name="status">
+              {% for s in ['upcoming','ongoing','completed'] %}
+              <option value="{{ s }}" {% if event and event.status==s %}selected{% endif %}>{{ s|capitalize }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Total Slots</label>
+            <input class="form-control" type="number" name="slots_total" value="{{ event.slots_total if event else 16 }}" min="2" max="256">
+          </div>
+          <div class="form-group">
+            <label>Entry Fee (₹)</label>
+            <input class="form-control" type="number" name="entry_fee" value="{{ event.entry_fee|int if event else 0 }}" min="0" step="10">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Prize Pool</label>
+          <input class="form-control" type="text" name="prize_pool" value="{{ event.prize_pool if event else '' }}" placeholder="₹5000 Prize Pool">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button type="submit" class="btn btn-primary" style="padding:0.7rem 2rem;">
+            {% if event %}Save Changes{% else %}Create Event{% endif %}
+          </button>
+          <a href="{{ url_for('admin_events') }}" class="btn btn-ghost">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

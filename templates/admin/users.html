@@ -1,0 +1,44 @@
+{% extends 'admin/base.html' %}
+{% block page_title %}Users{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-2">
+  <div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;">REGISTERED USERS</h2>
+    <p class="text-muted" style="font-size:0.9rem;">{{ users|length }} total accounts</p>
+  </div>
+</div>
+
+<div class="card">
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Events Joined</th>
+          <th>Verified Slots</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td class="text-muted" style="font-family:'Share Tech Mono',monospace;">{{ user.id }}</td>
+          <td><strong>{{ user.username }}</strong></td>
+          <td style="color:var(--muted);font-size:0.9rem;">{{ user.email }}</td>
+          <td><span class="badge badge-purple">{{ user.registrations|length }}</span></td>
+          <td>
+            {% set v = user.registrations|selectattr('verified','equalto',true)|list|length %}
+            <span class="badge badge-green">{{ v }}</span>
+          </td>
+          <td class="text-muted" style="font-size:0.85rem;">{{ user.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted);">No users yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

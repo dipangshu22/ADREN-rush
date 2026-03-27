@@ -1,0 +1,63 @@
+{% extends 'admin/base.html' %}
+{% block page_title %}Events{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-2">
+  <div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;">ALL EVENTS</h2>
+    <p class="text-muted" style="font-size:0.9rem;">{{ events|length }} total</p>
+  </div>
+  <a href="{{ url_for('admin_new_event') }}" class="btn btn-primary">+ Create Event</a>
+</div>
+
+<div class="card mt-2">
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Game</th>
+          <th>Date</th>
+          <th>Entry</th>
+          <th>Slots</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td>
+            <strong>{{ event.title }}</strong><br>
+            <span class="text-muted" style="font-size:0.8rem;">{{ event.prize_pool or 'No prize info' }}</span>
+          </td>
+          <td><span style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--accent);">{{ event.game }}</span></td>
+          <td style="font-size:0.88rem;color:var(--muted);">{{ event.event_date.strftime('%d %b %Y') }}<br>{{ event.event_date.strftime('%I:%M %p') }}</td>
+          <td style="font-weight:700;">₹{{ event.entry_fee|int }}</td>
+          <td>
+            {% set pct = (event.slots_filled / event.slots_total * 100)|int %}
+            <span class="badge {% if pct >= 100 %}badge-red{% elif pct >= 70 %}badge-yellow{% else %}badge-green{% endif %}">
+              {{ event.slots_filled }}/{{ event.slots_total }}
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if event.status=='upcoming' %}badge-green{% elif event.status=='ongoing' %}badge-yellow{% else %}badge-red{% endif %}">
+              {{ event.status }}
+            </span>
+          </td>
+          <td>
+            <div class="flex gap-1">
+              <a href="{{ url_for('admin_edit_event', event_id=event.id) }}" class="btn btn-ghost btn-sm">Edit</a>
+              <form method="POST" action="{{ url_for('admin_delete_event', event_id=event.id) }}" onsubmit="return confirm('Delete this event and all its registrations?')">
+                <button type="submit" class="btn btn-danger btn-sm">Del</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--muted);">No events yet. <a href="{{ url_for('admin_new_event') }}" style="color:var(--accent);">Create one →</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

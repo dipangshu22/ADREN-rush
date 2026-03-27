@@ -1,0 +1,106 @@
+{% extends 'admin/base.html' %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="stat-box accent">
+    <div class="num">{{ total_users }}</div>
+    <div class="lbl">Total Users</div>
+  </div>
+  <div class="stat-box purple">
+    <div class="num">{{ total_events }}</div>
+    <div class="lbl">Events Created</div>
+  </div>
+  <div class="stat-box yellow">
+    <div class="num">{{ pending }}</div>
+    <div class="lbl">Pending Verifications</div>
+  </div>
+  <div class="stat-box" style="">
+    <div class="num" style="color:#3fb950;">{{ verified }}</div>
+    <div class="lbl">Verified Slots</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+  <!-- Recent Registrations -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Recent Registrations</h3>
+      <a href="{{ url_for('admin_players') }}" class="btn btn-ghost btn-sm">View All</a>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Event</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reg in recent_regs %}
+          <tr>
+            <td>
+              <strong>{{ reg.user.username }}</strong><br>
+              <span class="text-muted" style="font-size:0.8rem;">{{ reg.ingame_name }}</span>
+            </td>
+            <td style="font-size:0.9rem;color:var(--muted);">{{ reg.event.title[:25] }}{% if reg.event.title|length > 25 %}…{% endif %}</td>
+            <td>
+              {% if reg.verified %}
+                <span class="badge badge-green">✓ #{{ reg.slot_number }}</span>
+              {% else %}
+                <span class="badge badge-yellow">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" style="text-align:center;color:var(--muted);padding:2rem;">No registrations yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Upcoming Events -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Upcoming Events</h3>
+      <a href="{{ url_for('admin_new_event') }}" class="btn btn-primary btn-sm">+ New</a>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Slots</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in upcoming %}
+          <tr>
+            <td>
+              <strong>{{ event.title[:20] }}{% if event.title|length > 20 %}…{% endif %}</strong><br>
+              <span class="text-muted" style="font-size:0.8rem;font-family:'Share Tech Mono',monospace;">{{ event.game }}</span>
+            </td>
+            <td style="font-size:0.85rem;color:var(--muted);">{{ event.event_date.strftime('%d %b %y') }}</td>
+            <td><span class="badge badge-green">{{ event.slots_filled }}/{{ event.slots_total }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" style="text-align:center;color:var(--muted);padding:2rem;">No upcoming events</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% if pending > 0 %}
+<div style="margin-top:1.5rem;background:rgba(240,165,0,0.06);border:1px solid rgba(240,165,0,0.2);border-radius:8px;padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+  <div>
+    <div style="color:#f0a500;font-weight:700;font-size:1.05rem;">⚠️ {{ pending }} registration(s) awaiting payment verification</div>
+    <div class="text-muted" style="font-size:0.88rem;margin-top:0.25rem;">Review and send confirmation emails to verified players.</div>
+  </div>
+  <a href="{{ url_for('admin_players', status='pending') }}" class="btn" style="background:#f0a500;color:#000;white-space:nowrap;">Review Now</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'admin/base.html' %}
+{% block page_title %}Players{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-2">
+  <div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;">PLAYER REGISTRATIONS</h2>
+    <p class="text-muted" style="font-size:0.9rem;">{{ registrations|length }} records</p>
+  </div>
+  <div class="flex gap-1">
+    <a href="{{ url_for('admin_players') }}" class="btn {% if status=='all' %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">All</a>
+    <a href="{{ url_for('admin_players', status='pending') }}" class="btn {% if status=='pending' %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">Pending</a>
+    <a href="{{ url_for('admin_players', status='verified') }}" class="btn {% if status=='verified' %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">Verified</a>
+  </div>
+</div>
+
+<div class="card">
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Event</th>
+          <th>In-Game Name</th>
+          <th>Payment</th>
+          <th>Registered</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registrations %}
+        <tr>
+          <td class="text-muted" style="font-family:'Share Tech Mono',monospace;">{{ reg.id }}</td>
+          <td>
+            <strong>{{ reg.user.username }}</strong><br>
+            <span class="text-muted" style="font-size:0.8rem;">{{ reg.user.email }}</span>
+          </td>
+          <td>
+            <span style="font-size:0.9rem;">{{ reg.event.title[:22] }}{% if reg.event.title|length > 22 %}…{% endif %}</span><br>
+            <span class="text-muted" style="font-size:0.75rem;font-family:'Share Tech Mono',monospace;">{{ reg.event.game }}</span>
+          </td>
+          <td style="font-weight:600;color:var(--accent);">{{ reg.ingame_name }}</td>
+          <td>
+            <span class="text-muted" style="font-size:0.85rem;">{{ reg.payment_method or '—' }}</span><br>
+            {% if reg.payment_screenshot %}
+              <span style="font-size:0.75rem;color:var(--muted);" title="{{ reg.payment_screenshot }}">Ref: {{ reg.payment_screenshot[:18] }}…</span>
+            {% endif %}
+          </td>
+          <td class="text-muted" style="font-size:0.82rem;">{{ reg.registered_at.strftime('%d %b %y %H:%M') }}</td>
+          <td>
+            {% if reg.verified %}
+              <span class="badge badge-green">✅ Slot #{{ reg.slot_number }}</span>
+            {% else %}
+              <span class="badge badge-yellow">⏳ Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not reg.verified %}
+              <div class="flex gap-1">
+                <form method="POST" action="{{ url_for('admin_verify', reg_id=reg.id) }}">
+                  <button type="submit" class="btn btn-primary btn-sm" title="Verify & send email">✓ Verify</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin_reject', reg_id=reg.id) }}" onsubmit="return confirm('Reject and remove this registration?')">
+                  <button type="submit" class="btn btn-danger btn-sm">✗ Reject</button>
+                </form>
+              </div>
+            {% else %}
+              <span class="text-muted" style="font-size:0.8rem;">Email sent</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" style="text-align:center;padding:3rem;color:var(--muted);">No registrations found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-2" style="padding:1rem;background:rgba(0,255,204,0.04);border:1px solid rgba(0,255,204,0.1);border-radius:8px;">
+  <p style="color:var(--muted);font-size:0.88rem;">
+    💡 <strong style="color:var(--text);">Workflow:</strong> 
+    When a player registers, ask them to send payment proof. Once verified, click <strong style="color:var(--accent);">Verify</strong> — 
+    the system will auto-assign a slot number and send a confirmation email to the player.
+  </p>
+</div>
+{% endblock %}

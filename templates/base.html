@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}ADREAN — Gaming Competitions{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a0f;
+      --surface: #0d1117;
+      --surface2: #161b22;
+      --border: #21262d;
+      --accent: #00ffcc;
+      --accent2: #ff3e6c;
+      --accent3: #7b5ea7;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --card: #0d1117;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 20% 20%, rgba(0,255,204,0.04) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, rgba(255,62,108,0.04) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,10,15,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      text-shadow: 0 0 24px rgba(0,255,204,0.5);
+    }
+    .nav-logo span { color: var(--accent2); }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-weight: 600; font-size: 0.9rem;
+      letter-spacing: 1px; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1.2rem;
+      border: none; cursor: pointer; border-radius: 4px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #000;
+      box-shadow: 0 0 20px rgba(0,255,204,0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 0 32px rgba(0,255,204,0.6); transform: translateY(-1px); }
+    .btn-danger { background: var(--accent2); color: #fff; }
+    .btn-danger:hover { filter: brightness(1.2); }
+    .btn-outline {
+      background: transparent; color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .btn-outline:hover { background: rgba(0,255,204,0.08); }
+    .btn-ghost {
+      background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    /* FLASH */
+    .flash-container { position: fixed; top: 70px; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: 0.5rem; }
+    .flash {
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px; font-weight: 600;
+      border-left: 4px solid;
+      background: var(--surface2);
+      min-width: 260px;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .flash.success { border-color: var(--accent); color: var(--accent); }
+    .flash.danger  { border-color: var(--accent2); color: var(--accent2); }
+    .flash.warning { border-color: #f0a500; color: #f0a500; }
+    .flash.info    { border-color: var(--accent3); color: var(--accent3); }
+    /* MAIN */
+    main { position: relative; z-index: 1; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    /* CARD */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: rgba(0,255,204,0.3); }
+    /* FORM */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label {
+      display: block; font-weight: 600;
+      font-size: 0.85rem; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .form-control {
+      width: 100%; padding: 0.65rem 1rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text);
+      font-family: 'Rajdhani', sans-serif; font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,255,204,0.1);
+    }
+    select.form-control option { background: var(--surface2); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+    /* BADGE */
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem;
+      border-radius: 4px; font-size: 0.75rem;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .badge-green { background: rgba(0,255,204,0.15); color: var(--accent); border: 1px solid rgba(0,255,204,0.3); }
+    .badge-red   { background: rgba(255,62,108,0.15); color: var(--accent2); border: 1px solid rgba(255,62,108,0.3); }
+    .badge-purple{ background: rgba(123,94,167,0.15); color: #b39ddb; border: 1px solid rgba(123,94,167,0.3); }
+    .badge-yellow{ background: rgba(240,165,0,0.15); color: #f0a500; border: 1px solid rgba(240,165,0,0.3); }
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    th { padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(33,38,45,0.5); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem; text-align: center;
+      color: var(--muted); font-size: 0.85rem; margin-top: 4rem;
+    }
+    .mono { font-family: 'Share Tech Mono', monospace; }
+    /* UTIL */
+    .text-accent { color: var(--accent); }
+    .text-danger { color: var(--accent2); }
+    .text-muted  { color: var(--muted); }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .mt-4 { margin-top: 2rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-1 { gap: 0.5rem; }
+    .gap-2 { gap: 1rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    @media(max-width:768px) {
+      .grid-2,.grid-3 { grid-template-columns: 1fr; }
+      .nav-links { gap: 0.75rem; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="{{ url_for('index') }}">ADRE<span>AN</span></a>
+    <div class="nav-links">
+      <a href="{{ url_for('events') }}">Events</a>
+      {% if session.get('user_id') %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Sign Up</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer>
+    <div class="mono">&copy; {{ now.year if now else 2025 }} ADREAN &mdash; Built for champions.</div>
+  </footer>
+
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.flash').forEach(el => el.style.opacity = '0');
+    }, 4000);
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

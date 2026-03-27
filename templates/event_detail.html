@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} — ADREAN{% endblock %}
+{% block extra_head %}
+<style>
+  .detail-wrap { max-width:800px; margin:0 auto; padding:3rem 1.5rem; }
+  .back-link { color:var(--muted); text-decoration:none; font-size:0.9rem; letter-spacing:1px; display:flex; align-items:center; gap:0.5rem; margin-bottom:2rem; }
+  .back-link:hover { color:var(--accent); }
+  .detail-game { font-family:'Share Tech Mono',monospace; font-size:0.8rem; color:var(--accent); letter-spacing:3px; text-transform:uppercase; margin-bottom:0.5rem; }
+  .detail-title { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:4px; line-height:1; margin-bottom:1rem; }
+  .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:2rem 0; }
+  .detail-item { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.25rem; }
+  .detail-item-label { font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:0.3rem; }
+  .detail-item-value { font-size:1.3rem; font-weight:700; color:var(--text); }
+  .detail-item-value.accent { color:var(--accent); }
+  .slot-bar { width:100%; height:8px; background:var(--border); border-radius:4px; margin-top:0.75rem; }
+  .slot-fill { height:100%; background:var(--accent); border-radius:4px; }
+  .slot-fill.warn { background:#f0a500; }
+  .slot-fill.full { background:var(--accent2); }
+  .desc-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:2rem; color:var(--muted); line-height:1.8; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="detail-wrap">
+  <a class="back-link" href="{{ url_for('events') }}">← Back to Events</a>
+  <div class="detail-game">{{ event.game }}</div>
+  <h1 class="detail-title">{{ event.title }}</h1>
+  <span class="badge {% if event.status=='upcoming' %}badge-green{% elif event.status=='ongoing' %}badge-yellow{% else %}badge-red{% endif %}">{{ event.status }}</span>
+
+  <div class="detail-grid mt-3">
+    <div class="detail-item">
+      <div class="detail-item-label">📅 Date & Time</div>
+      <div class="detail-item-value">{{ event.event_date.strftime('%d %b %Y') }}</div>
+      <div class="text-muted" style="font-size:0.9rem;">{{ event.event_date.strftime('%I:%M %p') }}</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-item-label">🏆 Prize Pool</div>
+      <div class="detail-item-value accent">{{ event.prize_pool or 'TBD' }}</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-item-label">💰 Entry Fee</div>
+      <div class="detail-item-value">₹{{ event.entry_fee|int }}</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-item-label">🎮 Slots</div>
+      <div class="detail-item-value">{{ event.slots_filled }} / {{ event.slots_total }} filled</div>
+      {% set pct = (event.slots_filled / event.slots_total * 100)|int %}
+      <div class="slot-bar">
+        <div class="slot-fill {% if pct >= 100 %}full{% elif pct >= 70 %}warn{% endif %}" style="width:{{ pct }}%"></div>
+      </div>
+    </div>
+  </div>
+
+  {% if event.description %}
+  <div class="desc-box">{{ event.description }}</div>
+  {% endif %}
+
+  {% if event.status == 'upcoming' %}
+    {% if not session.get('user_id') %}
+      <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding:0.85rem 2.5rem;font-size:1rem;">Login to Register</a>
+    {% elif already_registered %}
+      <div class="badge badge-green" style="padding:0.75rem 1.5rem;font-size:1rem;">✅ You are registered for this event</div>
+    {% elif event.slots_available <= 0 %}
+      <div class="badge badge-red" style="padding:0.75rem 1.5rem;font-size:1rem;">🔒 Event Full</div>
+    {% else %}
+      <a href="{{ url_for('join_event', event_id=event.id) }}" class="btn btn-primary" style="padding:0.85rem 2.5rem;font-size:1rem;">Register Now →</a>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block title %}ADREAN — Arena for Champions{% endblock %}
+{% block extra_head %}
+<style>
+  .hero {
+    min-height: 90vh;
+    display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    padding: 4rem 2rem;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ffcc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-content { max-width: 700px; position: relative; z-index: 1; }
+  .hero-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem; color: var(--accent);
+    letter-spacing: 3px; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .hero-tag::before {
+    content: ''; width: 30px; height: 1px; background: var(--accent);
+  }
+  h1.hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 0.9; letter-spacing: 4px;
+    margin-bottom: 1.5rem;
+  }
+  h1.hero-title span { color: var(--accent); }
+  .hero-sub {
+    font-size: 1.15rem; color: var(--muted);
+    max-width: 500px; margin-bottom: 2.5rem;
+    line-height: 1.7;
+  }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    padding-top: 2rem; border-top: 1px solid var(--border);
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem; color: var(--accent);
+    line-height: 1; letter-spacing: 2px;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .glow-ring {
+    position: absolute; right: -5%; top: 50%;
+    transform: translateY(-50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,204,0.1);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  .glow-ring::before {
+    content: ''; position: absolute; inset: 40px;
+    border-radius: 50%; border: 1px solid rgba(255,62,108,0.08);
+    animation: pulse 4s ease-in-out infinite reverse;
+  }
+  @keyframes pulse { 0%,100% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.05); } }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem; letter-spacing: 3px;
+  }
+  .section-title span { color: var(--accent); }
+  .events-section { padding: 5rem 0; }
+  .event-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    transition: all 0.3s; position: relative;
+  }
+  .event-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(0,255,204,0.08);
+  }
+  .event-card-top {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .event-game {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .event-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem; letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+  }
+  .event-card-body { padding: 1rem 1.5rem; }
+  .event-meta { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; color: var(--muted); }
+  .event-meta span { display: flex; align-items: center; gap: 0.5rem; }
+  .event-footer {
+    padding: 1rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid var(--border);
+  }
+  .slot-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+  .slot-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.6s; }
+  .slot-fill.warn { background: #f0a500; }
+  .slot-fill.full { background: var(--accent2); }
+  .features { padding: 5rem 0; }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2rem;
+    transition: border-color 0.2s;
+  }
+  .feature-card:hover { border-color: rgba(0,255,204,0.3); }
+  .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .feature-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
+  .feature-card p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; }
+</style>
+{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="glow-ring"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag">COMPETITIVE GAMING PLATFORM</div>
+      <h1 class="hero-title">ENTER THE <span>ARENA</span></h1>
+      <p class="hero-sub">
+        Compete in organized tournaments, claim your slot, and rise to the top.
+        Adrean is where serious players come to prove themselves.
+      </p>
+      <div class="hero-btns">
+        <a href="{{ url_for('events') }}" class="btn btn-primary">Browse Events</a>
+        {% if not session.get('user_id') %}
+          <a href="{{ url_for('register') }}" class="btn btn-outline">Create Account</a>
+        {% else %}
+          <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">My Dashboard</a>
+        {% endif %}
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">{{ events|length }}+</div>
+          <div class="stat-label">Live Events</div>
+        </div>
+        <div>
+          <div class="stat-num">16</div>
+          <div class="stat-label">Slots / Event</div>
+        </div>
+        <div>
+          <div class="stat-num">₹∞</div>
+          <div class="stat-label">Prize Pools</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="events-section">
+  <div class="container">
+    <div class="flex justify-between items-center mb-2">
+      <h2 class="section-title">UPCOMING <span>EVENTS</span></h2>
+      <a href="{{ url_for('events') }}" class="btn btn-ghost">View All →</a>
+    </div>
+    {% if events %}
+      <div class="grid-3 mt-3">
+        {% for event in events[:6] %}
+        {% set pct = (event.slots_filled / event.slots_total * 100)|int %}
+        <div class="event-card">
+          <div class="event-card-top">
+            <div class="event-game">{{ event.game }}</div>
+            <div class="event-title">{{ event.title }}</div>
+            <span class="badge {% if event.status=='upcoming' %}badge-green{% elif event.status=='ongoing' %}badge-yellow{% else %}badge-red{% endif %}">
+              {{ event.status }}
+            </span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-meta">
+              <span>📅 {{ event.event_date.strftime('%d %b %Y, %I:%M %p') }}</span>
+              <span>🏆 {{ event.prize_pool or 'TBD' }}</span>
+              <span>💰 Entry: ₹{{ event.entry_fee|int }}</span>
+              <span>🎮 Slots: {{ event.slots_filled }}/{{ event.slots_total }}</span>
+            </div>
+            <div class="slot-bar mt-1">
+              <div class="slot-fill {% if pct >= 100 %}full{% elif pct >= 70 %}warn{% endif %}" style="width:{{ pct }}%"></div>
+            </div>
+          </div>
+          <div class="event-footer">
+            <span class="text-muted" style="font-size:0.85rem">{{ event.slots_available }} slots left</span>
+            <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary" style="padding:0.4rem 1rem;font-size:0.8rem">Register →</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding:4rem;text-align:center;color:var(--muted);">
+        <div style="font-size:3rem;">🎮</div>
+        <p class="mt-2">No events scheduled yet. Check back soon!</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="features">
+  <div class="container">
+    <h2 class="section-title" style="text-align:center;">HOW IT <span>WORKS</span></h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Create Account</h3>
+        <p>Sign up with your email in seconds. Your profile is your identity in the arena.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Pick Your Event</h3>
+        <p>Browse upcoming tournaments filtered by game, date, or entry fee. Find your fight.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💳</div>
+        <h3>Register & Pay</h3>
+        <p>Submit your registration form and complete your payment. Screenshot confirms your intent.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Get Verified</h3>
+        <p>Admin reviews your payment and sends a confirmation email with your official slot number.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
