@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{% block title %}ADREAN — Gaming Competitions{% endblock %}</title>
+  <title>{% block title %}ADREN — Gaming Competitions{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
@@ -185,7 +185,7 @@
 </head>
 <body>
   <nav>
-    <a class="nav-logo" href="{{ url_for('index') }}">ADRE<span>AN</span></a>
+    <a class="nav-logo" href="{{ url_for('index') }}">ADR<span>EN</span></a>
     <div class="nav-links">
       <a href="{{ url_for('events') }}">Events</a>
       {% if session.get('user_id') %}
